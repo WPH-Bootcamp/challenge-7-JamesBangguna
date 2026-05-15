@@ -1,24 +1,108 @@
-// TODO: Import readline untuk membaca input dari command line
+import promptSync from 'prompt-sync';
+import {
+  addTodo,
+  completeTodo,
+  deleteTodo,
+  getTodos,
+  listTodos,
+} from './todoService';
 
-// TODO: Import fungsi-fungsi dari todoService
+const prompt = promptSync({ sigint: true });
 
-// TODO: Import fungsi-fungsi dari utils (termasuk type guards)
+function showMenu(): void {
+  console.log('\n===== TODO APP TYPESCRIPT =====');
+  console.log('1. Lihat Todos');
+  console.log('2. Tambah Todo');
+  console.log('3. Selesaikan Todo');
+  console.log('4. Hapus Todo');
+  console.log('5. Exit');
+}
 
-// TODO: Buat fungsi untuk menampilkan menu utama
-// Tampilkan opsi seperti:
-// 1. Add new todo
-// 2. Mark todo as complete
-// 3. Delete todo
-// 4. List all todos
-// 5. Search todos
-// 6. Exit
+function handleAddTodo(): void {
+  const title = prompt('Masukkan todo: ').trim();
 
-// TODO: Buat fungsi untuk handle input dari user
-// Gunakan readline.question untuk menerima input
+  if (!title) {
+    console.log('Title tidak boleh kosong.');
+    return;
+  }
 
-// TODO: Buat fungsi main yang akan menjalankan aplikasi secara loop
-// Hint: Gunakan recursive function atau while loop
+  addTodo(title);
+}
 
-// TODO: Jalankan fungsi main
-console.log('Welcome to TypeScript To-Do App!');
-console.log('Start building your app here...');
+function handleCompleteTodo(): void {
+  const todos = getTodos();
+
+  if (todos.length === 0) {
+    console.log('Belum ada todo.');
+    return;
+  }
+
+  listTodos();
+
+  const input = prompt('Masukkan ID todo: ');
+  const id = Number(input);
+
+  if (Number.isNaN(id)) {
+    console.log('ID harus berupa angka.');
+    return;
+  }
+
+  completeTodo(id);
+}
+
+function handleDeleteTodo(): void {
+  const todos = getTodos();
+
+  if (todos.length === 0) {
+    console.log('Belum ada todo.');
+    return;
+  }
+
+  listTodos();
+
+  const input = prompt('Masukkan ID todo yang ingin dihapus: ');
+  const id = Number(input);
+
+  if (Number.isNaN(id)) {
+    console.log('ID harus berupa angka.');
+    return;
+  }
+  deleteTodo(id);
+}
+
+function main(): void {
+  let running = true;
+
+  while (running) {
+    showMenu();
+
+    const choice = prompt('Pilih menu: ').trim();
+
+    switch (choice) {
+      case '1':
+        listTodos();
+        break;
+
+      case '2':
+        handleAddTodo();
+        break;
+
+      case '3':
+        handleCompleteTodo();
+        break;
+
+      case '4':
+        handleDeleteTodo();
+        break;
+
+      case '5':
+        console.log('Terima kasih.');
+        running = false;
+        break;
+
+      default:
+        console.log('Pilihan tidak valid.');
+    }
+  }
+}
+main();
