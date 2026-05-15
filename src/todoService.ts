@@ -1,24 +1,72 @@
-// TODO: Import tipe-tipe yang sudah didefinisikan di types.ts
+import { Todo } from './types';
+import { generateId } from './utils';
+import { readTodos, writeTodos } from './storage';
 
-// TODO: Import fungsi storage untuk baca/tulis file
+export function getTodos(): Todo[] {
+  return readTodos();
+}
 
-// TODO: Buat fungsi untuk menambahkan To-Do baru
-// - Generate id yang unik (bisa pakai timestamp atau counter)
-// - Pastikan text tidak kosong
-// - Set default status sebagai active
+export function addTodo(title: string): void {
+  const todos = readTodos();
 
-// TODO: Buat fungsi untuk menandai To-Do sebagai selesai
-// - Cari To-Do berdasarkan id
-// - Ubah statusnya menjadi completed
-// - Handle kasus jika id tidak ditemukan
+  const newTodo: Todo = {
+    id: generateId(),
+    title,
+    completed: false,
+    createdAt: new Date().toISOString(),
+  };
 
-// TODO: Buat fungsi untuk menghapus To-Do
-// - Filter To-Do berdasarkan id
-// - Handle kasus jika id tidak ditemukan
+  todos.push(newTodo);
 
-// TODO: Buat fungsi untuk menampilkan semua To-Do
-// - Tampilkan dengan format yang rapi
-// - Tambahkan status [ACTIVE] atau [DONE] di depan setiap To-Do
-// - Berikan nomor urut untuk memudahkan user memilih
+  writeTodos(todos);
 
-// TODO: Buat fungsi untuk mencari To-Do berdasarkan keyword
+  console.log('Todo berhasil ditambahkan.');
+}
+
+export function listTodos(): void {
+  const todos = readTodos();
+
+  if (todos.length === 0) {
+    console.log('Belum ada todo.');
+    return;
+  }
+
+  console.log('\n===== TODO LIST =====');
+
+  todos.forEach((todo, index) => {
+    const status = todo.completed ? '[DONE]' : '[ACTIVE]';
+
+    console.log(`${status} ${index + 1}. ${todo.title}`);
+  });
+}
+
+export function completeTodo(id: number): void {
+  const todos = readTodos();
+
+  const todo = todos.find((item) => item.id === id);
+
+  if (!todo) {
+    console.log('Todo tidak ditemukan.');
+    return;
+  }
+
+  todo.completed = true;
+
+  writeTodos(todos);
+
+  console.log('Todo berhasil diselesaikan.');
+}
+
+export function deleteTodo(id: number): void {
+  const todos = readTodos();
+
+  const filteredTodos = todos.filter((todo) => todo.id !== id);
+
+  if (filteredTodos.length === todos.length) {
+    console.log('Todo tidak ditemukan.');
+    return;
+  }
+  writeTodos(filteredTodos);
+
+  console.log('Todo berhasil dihapus.');
+}
